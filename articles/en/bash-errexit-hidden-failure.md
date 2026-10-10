@@ -4,7 +4,7 @@ Original publication: [GitHub Gist](https://gist.github.com/BenkiNew/03f6f203f67
 
 Scripts: [minimal reproduction](../../examples/bash-errexit/bash-errexit-repro.sh), [additional contexts](../../examples/bash-errexit/bash-errexit-contexts.sh).
 
-Author: **ХАКЕРБАНК / XAKERBANK** — [BenkiNew](https://github.com/BenkiNew).
+Author: **Kostiantyn Bank (ХакерБанк / XAKERBANK)** · [XAKERBANK Labs](https://github.com/BenkiNew) · [DOU](https://dou.ua/users/kostyantin-bank/).
 
 In Bash, `(set -e; generate; compare) || report_failure` can hide a failure in `generate`. The subshell is on the left side of `||`, so `errexit` is ignored inside it. If execution reaches a successful final command, the block returns 0. This is documented Bash behavior; changing Bash itself would not be an appropriate bugfix for this case.
 

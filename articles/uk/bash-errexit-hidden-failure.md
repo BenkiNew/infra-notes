@@ -4,7 +4,7 @@
 
 Скрипти: [мінімальне відтворення](../../examples/bash-errexit/bash-errexit-repro.sh), [додаткові контексти](../../examples/bash-errexit/bash-errexit-contexts.sh).
 
-Автор: **ХАКЕРБАНК / XAKERBANK** — [BenkiNew](https://github.com/BenkiNew).
+Автор: **Костянтин Банк (ХакерБанк / XAKERBANK)** · [XAKERBANK Labs](https://github.com/BenkiNew) · [DOU](https://dou.ua/users/kostyantin-bank/).
 
 У Bash конструкція `(set -e; generate; compare) || report_failure` може приховати збій `generate`. У цій конструкції subshell стоїть ліворуч від `||`, тому `errexit` усередині нього ігнорується. Якщо виконання доходить до останньої успішної команди, статус блоку буде 0. Це документована семантика Bash, тому пропозиція змінити сам Bash тут не є доречним bugfix PR.
 
