@@ -13,7 +13,7 @@ These articles explain problems we encountered, the evidence used to investigate
 ### Статті
 
 - [Як моніторинг помиляється: стара помилка, вимкнений сервіс і недоступна перевірка](articles/uk/monitoring-with-evidence.md) — [публікація на DOU, 10.10.2026](https://dou.ua/forums/topic/62492/).
-- [Як невдале оновлення перетворилося на «без змін»](articles/uk/bash-errexit-hidden-failure.md) — Bash `errexit` і systemd; [першоджерело та скрипти у Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02).
+- [Синхронізація успішна, дані застарілі: як Bash і systemd приховали збій після переносу](articles/uk/bash-errexit-hidden-failure.md) — Bash `errexit` і systemd `ReadWritePaths`; [публікація на DOU, 11.10.2026](https://dou.ua/forums/topic/62516/), [першоджерело та скрипти у Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02).
 
 ### Наступні теми
 
@@ -24,11 +24,11 @@ These articles explain problems we encountered, the evidence used to investigate
 
 ## English
 
-The first article is currently available in Ukrainian. It covers misleading monitoring signals: an old error presented as a current incident, an intentionally disabled job presented as healthy, and a failed probe reported as zero errors. It also explains why an inactive oneshot service can be normal and why a running process does not prove application health.
+Both articles are published on DOU in Ukrainian: [monitoring with evidence, 10.10.2026](https://dou.ua/forums/topic/62492/) and [sync succeeded, data went stale, 11.10.2026](https://dou.ua/forums/topic/62516/).
 
-An English translation of the monitoring article is planned.
+The monitoring article is currently available in Ukrainian only. It covers misleading monitoring signals: an old error presented as a current incident, an intentionally disabled job presented as healthy, and a failed probe reported as zero errors. It also explains why an inactive oneshot service can be normal and why a running process does not prove application health. An English translation is planned.
 
-- [How a failed update became “unchanged”](articles/en/bash-errexit-hidden-failure.md) — Bash `errexit`, systemd filesystem restrictions, and synthetic reproduction scripts; [original Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02).
+- [Sync succeeded, data went stale: how Bash and systemd hid a failure after a move](articles/en/bash-errexit-hidden-failure.md) — Bash `errexit`, systemd filesystem restrictions, and synthetic reproduction scripts; [original Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02).
 
 Questions and reports in either Ukrainian or English are welcome in [Discussions](https://github.com/BenkiNew/infra-notes/discussions).
 
