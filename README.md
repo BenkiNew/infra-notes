@@ -8,7 +8,7 @@ These articles explain problems we encountered, the evidence used to investigate
 
 Технічні матеріали **[BenkiNew](https://github.com/BenkiNew)** з експлуатації Linux-серверів, моніторингу та відновлення сервісів.
 
-Пишу про експлуатацію Linux-серверів: що сталося, як перевіряли, що змінили та чого перевірка не доводить. [Профіль автора на DOU](https://dou.ua/users/kostyantin-bank/).
+Пишу про експлуатацію Linux-серверів: що сталося, як перевіряли, що змінили та чого перевірка не доводить. [Профіль автора на DOU](https://dou.ua/users/kostiantyn-bank/).
 
 ### Статті
 
