@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# XAKERBANK / BenkiNew: synthetic Bash context checks, no services or data.
+# BenkiNew: synthetic Bash context checks, no services or data.
 set -u
 check() {
   local label="$1" code="$2" output status

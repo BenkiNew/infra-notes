@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Author: XAKERBANK (BenkiNew) — https://github.com/BenkiNew
+# Author: BenkiNew — https://github.com/BenkiNew
 # Synthetic example: no files, credentials, network or service operations.
 set -u
 legacy() {
