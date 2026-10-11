@@ -13,7 +13,7 @@ These articles explain problems we encountered, the evidence used to investigate
 ### Статті
 
 - [Як моніторинг помиляється: стара помилка, вимкнений сервіс і недоступна перевірка](articles/uk/monitoring-with-evidence.md) — [публікація на DOU, 10.10.2026](https://dou.ua/forums/topic/62492/).
-- [Синхронізація успішна, дані застарілі: як Bash і systemd приховали збій після переносу](articles/uk/bash-errexit-hidden-failure.md) — Bash `errexit` і systemd `ReadWritePaths`; [публікація на DOU, 11.10.2026](https://dou.ua/forums/topic/62516/), [першоджерело та скрипти у Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02).
+- [Синхронізація успішна, дані застарілі: як Bash і systemd приховали збій після переносу](articles/uk/bash-errexit-hidden-failure.md) — технічний розбір Bash `errexit` і systemd `ReadWritePaths`; [першоджерело та скрипти у Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02), [стаття на його основі на DOU, 11.10.2026](https://dou.ua/forums/topic/62516/).
 
 ### Наступні теми
 
@@ -24,7 +24,7 @@ These articles explain problems we encountered, the evidence used to investigate
 
 ## English
 
-Both articles are published on DOU in Ukrainian: [monitoring with evidence, 10.10.2026](https://dou.ua/forums/topic/62492/) and [sync succeeded, data went stale, 11.10.2026](https://dou.ua/forums/topic/62516/).
+Related Ukrainian articles on DOU: [monitoring with evidence, 10.10.2026](https://dou.ua/forums/topic/62492/) and [sync succeeded, data went stale, 11.10.2026](https://dou.ua/forums/topic/62516/). The Bash/systemd article is based on the original GitHub material; this repository maintains the technical explanations, examples, and clarifications.
 
 The monitoring article is currently available in Ukrainian only. It covers misleading monitoring signals: an old error presented as a current incident, an intentionally disabled job presented as healthy, and a failed probe reported as zero errors. It also explains why an inactive oneshot service can be normal and why a running process does not prove application health. An English translation is planned.
 

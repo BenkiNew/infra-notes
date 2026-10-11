@@ -2,7 +2,7 @@
 
 **Автор:** Костянтин Банк (ХакерБанк / XAKERBANK) · [XAKERBANK Labs](https://github.com/BenkiNew) · **Дата:** 11.10.2026
 
-Опубліковано на [DOU](https://dou.ua/forums/topic/62516/) 11.10.2026; цей текст синхронізовано з публікацією. Першоджерело і скрипти — [GitHub Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02) (перша публікація 10.10.2026, синхронізовано з цією версією); робоча назва матеріалу була «Як невдале оновлення перетворилося на «без змін»». [English version](../en/bash-errexit-hidden-failure.md).
+Першоджерело цього технічного матеріалу та скрипти — [GitHub Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02), уперше опублікований 10.10.2026. Репозиторій зберігає пояснення, приклади та подальші технічні уточнення. На основі матеріалу 11.10.2026 опубліковано [статтю на DOU](https://dou.ua/forums/topic/62516/). Робоча назва матеріалу — «Як невдале оновлення перетворилося на «без змін»». [English version](../en/bash-errexit-hidden-failure.md).
 
 Скрипти: [мінімальне відтворення](../../examples/bash-errexit/bash-errexit-repro.sh), [додаткові контексти](../../examples/bash-errexit/bash-errexit-contexts.sh).
 
