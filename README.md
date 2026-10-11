@@ -1,12 +1,12 @@
-# XAKERBANK Labs · Infrastructure notes
+# BenkiNew · Infrastructure notes
 
-Practical notes by **Kostiantyn Bank (ХакерБанк / XAKERBANK)**, author of [XAKERBANK Labs](https://github.com/BenkiNew), on Linux servers, monitoring, recovery, and self-hosted services. **BenkiNew** is my GitHub username.
+Practical notes by **[BenkiNew](https://github.com/BenkiNew)** on Linux servers, monitoring, recovery, and self-hosted services.
 
 These articles explain problems we encountered, the evidence used to investigate them, and the limits of the conclusions. Examples use fictional service names and data. Production configurations, private reports, and personal data are not included.
 
 ## Українською
 
-Технічні матеріали **XAKERBANK Labs** — незалежної інженерної лабораторії **Костянтина Банка**. **ХакерБанк / XAKERBANK** — мій авторський псевдонім, **BenkiNew** — логін GitHub.
+Технічні матеріали **[BenkiNew](https://github.com/BenkiNew)** з експлуатації Linux-серверів, моніторингу та відновлення сервісів.
 
 Пишу про експлуатацію Linux-серверів: що сталося, як перевіряли, що змінили та чого перевірка не доводить. [Профіль автора на DOU](https://dou.ua/users/kostyantin-bank/).
 

@@ -1,6 +1,6 @@
 # Sync succeeded, data went stale: how Bash and systemd hid a failure after a move
 
-**Author:** Kostiantyn Bank (ХакерБанк / XAKERBANK) · [XAKERBANK Labs](https://github.com/BenkiNew) · **Date:** 11.10.2026
+**Author:** [BenkiNew](https://github.com/BenkiNew) · **Date:** 11.10.2026
 
 The original source of this technical material and its scripts is the [GitHub Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02), first published on 10.10.2026. This repository maintains the explanations, examples, and subsequent technical clarifications. An [article based on the material was published on DOU](https://dou.ua/forums/topic/62516/) on 11.10.2026 (in Ukrainian). The working title was “How a failed update became ‘unchanged’”. [Українська версія](../uk/bash-errexit-hidden-failure.md).
 
