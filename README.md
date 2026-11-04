@@ -30,7 +30,6 @@ Related Ukrainian articles on DOU: [monitoring with evidence, 10.10.2026](https:
 The monitoring article is currently available in Ukrainian only. It covers misleading monitoring signals: an old error presented as a current incident, an intentionally disabled job presented as healthy, and a failed probe reported as zero errors. It also explains why an inactive oneshot service can be normal and why a running process does not prove application health. An English translation is planned.
 
 - [Sync succeeded, data went stale: how Bash and systemd hid a failure after a move](articles/en/bash-errexit-hidden-failure.md) — Bash `errexit`, systemd filesystem restrictions, and synthetic reproduction scripts; [original Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02).
-
 - ["Transmit queue timed out" on Intel I219-LM: it looks like a pause-frame storm, not memory pressure or Wi-Fi](articles/en/e1000e-pause-frames-tx-timeout.md) — three `e1000e` hang incidents, hypotheses ruled out with evidence, the match with unbalanced XOFF, and the limits of the conclusion; the result of the fix will be added; [original Gist](https://gist.github.com/BenkiNew/8309e06fb9810ba6a5f988dbc1efb552).
 
 Questions and reports in either Ukrainian or English are welcome in [Discussions](https://github.com/BenkiNew/infra-notes/discussions).
