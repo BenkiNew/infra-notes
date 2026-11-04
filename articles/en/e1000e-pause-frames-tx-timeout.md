@@ -58,10 +58,12 @@ Because Wi-Fi failures preceded every incident, the most plausible chain is an u
 
 Note: changing pause parameters resets the adapter, so apply it on a live system at a quiet moment.
 
+**Timeline correction.** We changed the NetworkManager profile on 04.11.2026 at 15:08, but the running adapter kept pause enabled: NetworkManager applies `ethtool` settings only when the profile is (re)activated, and `nmcli device reapply` refuses to change them on a live device (`Can't reapply any changes to 'ethtool' setting`). The settings reached the live adapter only when `ethtool -A` was run directly at about 21:35 the same day (the link stayed up). So the observation window for this mitigation starts at 21:35 on 04.11.2026, and the quiet hours before that were *without* it. Always verify the live state with `ethtool -a <interface>`, not only the saved profile.
+
 ## What we do not know
 
 - The sample is three incidents. The correlation with an XOFF burst is accurate to the minute, but the counters were sampled once a minute.
-- Who actually sends the XOFF, the switch or another device on the network, is not established; we have no access to the switch.
+- Who actually sends the XOFF is not proven, but the only device on the link is an unmanaged 10/100 Mbit Fast Ethernet switch (identified from its label on 04.11.2026). That also explains why the 1 Gbit-capable card always negotiated 100 Mbit: the switch advertises only 10/100. A heavily used 100 Mbit link is a plausible source of congestion and XOFF; replacing it with a gigabit switch is planned, and we will report the effect.
 - Whether disabling pause removes the failures is not yet verified. The success criterion: several weeks without unbalanced XOFF bursts and without `tx_timeout_count` > 0. We will add the result to this text.
 - Wi-Fi failures coincided with all three incidents (1-2 min earlier), so a common upstream cause (router, switch, power) is not excluded and was not tested.
 - A physical fault of this particular adapter or port cannot be excluded. The most reliable workaround is a second network card with a different chip.
