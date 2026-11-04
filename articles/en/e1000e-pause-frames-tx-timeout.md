@@ -2,6 +2,8 @@
 
 **Author:** [BenkiNew](https://github.com/BenkiNew) · **Date:** 04.11.2026
 
+Original notes, per-minute counters (CSV), and the collection script: [Gist](https://gist.github.com/BenkiNew/8309e06fb9810ba6a5f988dbc1efb552).
+
 This is a write-up of one recurring network-adapter failure on a Linux server, the evidence we collected, and the limits of the conclusion. Host names, addresses, and internal service names are omitted; counter values come from real measurements. These are three incidents on one server: a small sample, not statistics.
 
 ## Symptom
