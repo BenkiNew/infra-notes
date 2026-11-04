@@ -1,4 +1,4 @@
-# "Transmit queue timed out" on Intel I219-LM: it looks like a pause-frame storm, not memory pressure or Wi-Fi
+# "Transmit queue timed out" on Intel I219-LM: it looks like a pause-frame storm, not memory pressure
 
 **Author:** [BenkiNew](https://github.com/BenkiNew) · **Date:** 04.11.2026
 
@@ -21,7 +21,7 @@ Carrier stayed "up", but the network did not work. In the severe case only a reb
 | Hypothesis | Check | Result |
 | --- | --- | --- |
 | Memory shortage or swap storm | `sar -B/-u/-S` in the event windows, compared with the day's percentiles | in two incidents paging and iowait were below the day's median (27-46th percentile); only the third was an outlier (98th). No common cause |
-| Wi-Fi failure as the trigger | NetworkManager and wpa_supplicant logs before each event | in two incidents Wi-Fi dropped 1.5-2 min earlier; in the third it was healthy. Not a required condition |
+| Wi-Fi failure as the trigger | NetworkManager, wpa_supplicant and guard logs before each event | **in all three incidents the Wi-Fi uplink failed (authentication failures, SSID not found) 1-2 min before the first TX timeout.** A strong coincidence, not proof of cause: most likely a common upstream trigger (router/switch instability or power) |
 | PCI runtime PM / D3 | `power/control`, `runtime_status`, `runtime_suspended_time` | `on`, `active`, 0 s suspended |
 | ASPM | `lspci -vv` | no LnkCap entry for the integrated I219, not applicable |
 | EEE, GSO/GRO, TSO | `ethtool -k`, `--show-eee` | already disabled; the failure still recurred |
@@ -48,6 +48,8 @@ Control: before and after those minutes the pairs were equal. Large balanced bur
 
 The switch sends XOFF when its port buffer overflows, for example because of a slow client. If XON is late or lost, the adapter cannot transmit for more than 5 s, `e1000e` reports "transmit queue timed out" and resets the adapter. In the severe case the reset does not bring the transmit queue back.
 
+Because Wi-Fi failures preceded every incident, the most plausible chain is an upstream event (router/switch restart, port flap, or a power glitch) that both drops the Wi-Fi uplink and makes the switch emit an XOFF burst. This is a hypothesis: we have no access to the switch.
+
 ## What we did
 
 - Disabled receiving and sending pause frames and their autonegotiation: `ethtool -A <interface> autoneg off rx off tx off`; in NetworkManager, `ethtool.pause-autoneg=no`, `ethtool.pause-rx=no`, `ethtool.pause-tx=no`. Side effect: when the switch is congested, packets are dropped (TCP copes) instead of stalling the whole port.
@@ -61,6 +63,7 @@ Note: changing pause parameters resets the adapter, so apply it on a live system
 - The sample is three incidents. The correlation with an XOFF burst is accurate to the minute, but the counters were sampled once a minute.
 - Who actually sends the XOFF, the switch or another device on the network, is not established; we have no access to the switch.
 - Whether disabling pause removes the failures is not yet verified. The success criterion: several weeks without unbalanced XOFF bursts and without `tx_timeout_count` > 0. We will add the result to this text.
+- Wi-Fi failures coincided with all three incidents (1-2 min earlier), so a common upstream cause (router, switch, power) is not excluded and was not tested.
 - A physical fault of this particular adapter or port cannot be excluded. The most reliable workaround is a second network card with a different chip.
 
 ## How to check on your system
