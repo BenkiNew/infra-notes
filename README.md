@@ -14,6 +14,7 @@ These articles explain problems we encountered, the evidence used to investigate
 
 - [Як моніторинг помиляється: стара помилка, вимкнений сервіс і недоступна перевірка](articles/uk/monitoring-with-evidence.md) — [публікація на DOU, 10.10.2026](https://dou.ua/forums/topic/62492/).
 - [Синхронізація успішна, дані застарілі: як Bash і systemd приховали збій після переносу](articles/uk/bash-errexit-hidden-failure.md) — технічний розбір Bash `errexit` і systemd `ReadWritePaths`; [першоджерело та скрипти у Gist](https://gist.github.com/BenkiNew/03f6f203f6709b8102b2e47b7b899d02), [стаття на його основі на DOU, 11.10.2026](https://dou.ua/forums/topic/62516/).
+- [«Transmit queue timed out» на Intel I219-LM: схоже, шторм pause-кадрів, а не пам’ять і не Wi-Fi](articles/uk/e1000e-pause-frames-tx-timeout.md) — три випадки зависання `e1000e`, відкинуті гіпотези з доказами, збіг із незбалансованими XOFF і межі висновку; результат перевірки виправлення буде дописано.
 
 ### Наступні теми
 
