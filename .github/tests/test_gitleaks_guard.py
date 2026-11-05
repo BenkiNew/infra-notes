@@ -14,7 +14,7 @@ IGNORE = os.environ.get("GITLEAKS_IGNORE_TRUSTED")
 @unittest.skipUnless(BINARY and CONFIG and IGNORE, "Потрібен перевірений Gitleaks та довірена конфігурація")
 class GitleaksGuardTests(unittest.TestCase):
     def git(self, root, *args):
-        return subprocess.check_output(["git", "-C", str(root), *args], stderr=subprocess.PIPE).decode().strip()
+        return subprocess.check_output(["git", "-c", "user.name=Synthetic", "-c", "user.email=audit@example.invalid", "-C", str(root), *args], stderr=subprocess.PIPE).decode().strip()
 
     def commit(self, root):
         self.git(root, "add", ".")
