@@ -1,4 +1,6 @@
 """Синтетичні перевірки guard; файли та програми проєкту не виконуються."""
+import io
+from contextlib import redirect_stdout
 import importlib.util
 from pathlib import Path
 import tempfile
@@ -93,3 +95,13 @@ class ChangeGuardTests(unittest.TestCase):
             result = subprocess.run([sys.executable, "-I", "-c", "import json; print(json.dumps({'safe': True}))"],
                                     cwd=root, capture_output=True, text=True, check=True)
             self.assertIn('"safe": true', result.stdout)
+
+    def test_filename_cannot_inject_workflow_commands(self):
+        """Git-ім’я з новим рядком не створює workflow-команду в логу."""
+        output = io.StringIO()
+        name = "x\n::error::forged.py"
+        with patch.object(guard, "run_git", side_effect=[b"", name.encode() + b"\0"]), \
+                patch.object(guard, "check_file", side_effect=SyntaxError), redirect_stdout(output):
+            self.assertEqual(guard.main(Path.cwd(), "b" * 40, "a" * 40), 1)
+        self.assertNotIn("\n::error::", output.getvalue())
+        self.assertIn("\\n::error::", output.getvalue())

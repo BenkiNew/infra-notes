@@ -17,7 +17,7 @@ import yaml
 
 def run_git(root, *args):
     """Прочитати Git; будь-яка помилка припиняє перевірку."""
-    return subprocess.check_output(["git", "-C", str(root), *args])
+    return subprocess.check_output(["git", "-C", str(root), *args], stderr=subprocess.PIPE)
 
 
 def safe_path(root, name):
@@ -93,7 +93,7 @@ def main(root, base, head):
             check_file(root, name)
         except (OSError, ValueError, SyntaxError, yaml.YAMLError, subprocess.SubprocessError) as error:
             # Не виводити вміст джерела або повідомлення парсера з його рядками.
-            print("Помилка перевірки:", name, type(error).__name__)
+            print("Помилка перевірки:", ascii(name), type(error).__name__)
             failed.append(name)
     print("Перевірено змінених файлів:", len(names), "; помилок:", len(failed))
     return 1 if failed else 0
