@@ -30,9 +30,11 @@ repository-guard і CodeRabbit обов’язковими, вмикає акт�
 ## Довірений гейт
 
 `trusted-repository-guard` на pull_request_target бере скрипти й тести
-з точного base SHA, кандидат — з refs/pull/NUMBER/head в окремій теці.
+з точного base SHA, кандидат — з точного head SHA в окремій теці; перед перевіркою
+git rev-parse HEAD обов’язково має збігтися з HEAD_SHA.
 Доступ токена лише contents:read; persist-credentials=false, секрети не
-передаються. Код, пакети, тести та GitHub Actions кандидата не виконуються.
+передаються. Python працює з -I: cwd, PYTHONPATH та user-site не можуть підмінити
+стандартні модулі. Код, пакети, тести та GitHub Actions кандидата не виконуються.
 З кандидата читаються лише Git-дані та синтаксис файлів; node --check і
 compile не виконують перевірюваний код. Правила Gitleaks закріплені окремо.
 
