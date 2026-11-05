@@ -61,5 +61,10 @@ jobs:
           GITLEAKS_BINARY="$RUNNER_TEMP/gitleaks" GITLEAKS_CONFIG_TRUSTED="$config" \
             GITLEAKS_IGNORE_TRUSTED="$ignore" \
             python -I -m unittest discover -s .github/tests -p test_gitleaks_guard.py
+          # Gitleaks також автоматично читає кореневий ignore попри явний -i.
+          # Видаляється лише цей файл у тимчасовому checkout; каталог спричинить помилку.
+          if [[ -e .gitleaksignore || -L .gitleaksignore ]]; then
+            rm -- .gitleaksignore
+          fi
           "$RUNNER_TEMP/gitleaks" git --config="$config" --gitleaks-ignore-path="$ignore" \
             --ignore-gitleaks-allow --redact=100 --no-banner --exit-code=1 --log-opts="$span" .

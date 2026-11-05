@@ -37,6 +37,8 @@ class GitleaksGuardTests(unittest.TestCase):
 
     def scan(self, root, span):
         """Повернути код і замасковані знахідки, не плутаючи помилку зі сканом."""
+        # Відтворює очищення лише кореневого ignore у тимчасовому checkout.
+        (root / ".gitleaksignore").unlink(missing_ok=True)
         report = root.parent / (root.name + "-gitleaks.json")
         result = subprocess.run([BINARY, "git", "--config=" + CONFIG,
             "--gitleaks-ignore-path=" + IGNORE, "--ignore-gitleaks-allow", "--redact=100",
@@ -79,5 +81,15 @@ class GitleaksGuardTests(unittest.TestCase):
             self.git(root, "merge", "--no-commit", "--no-ff", "feature")
             (root / "secret.txt").write_text(self.fake_secret() + " # gitleaks:allow", encoding="utf-8")
             (root / ".gitleaks.toml").write_text('[extend]\nuseDefault = true\n[allowlist]\nregexes = [".*"]\n', encoding="utf-8")
+            (root / ".gitleaksignore").write_text("secret.txt:github-pat:1\n", encoding="utf-8")
             head = self.commit(root)
             self.assert_secret_found(root, base + ".." + head)
+
+    def test_ignore_directory_is_an_error(self):
+        """Каталог замість ignore-файла не може вимкнути захист мовчки."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            head = self.initialize(root)
+            (root / ".gitleaksignore").mkdir()
+            with self.assertRaises(IsADirectoryError if os.name != "nt" else PermissionError):
+                self.scan(root, head)
