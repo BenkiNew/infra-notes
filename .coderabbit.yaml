@@ -1,0 +1,28 @@
+language: uk-UA
+
+reviews:
+  fail_commit_status: true
+  # Без перехресних посилань між репозиторіями (приватні PR не лінкуються на публічні й навпаки)
+  related_issues: false
+  related_prs: false
+  auto_review:
+    # Огляд будь-якого PR, у тому числі стекових (база не main), без паузи після 5 комітів.
+    base_branches:
+      - ".*"
+    auto_pause_after_reviewed_commits: 0
+
+  path_instructions:
+    - path: "**"
+      instructions: |
+        - Дотримуйся AGENTS.md цього репозиторію.
+        - Персональні дані (ПІБ, ІПН, телефони, паспорти, email), секрети й ключі не мають потрапляти в код, тести чи документацію; лише синтетичні дані.
+        - Спілкування й коментарі — українською.
+
+knowledge_base:
+  learnings:
+    scope: local
+  issues:
+    scope: local
+  pull_requests:
+    scope: local
+  automatic_linking_mode: disabled

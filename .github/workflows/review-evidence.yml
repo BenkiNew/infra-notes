@@ -1,0 +1,67 @@
+name: Доказ фактичного огляду
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+  issue_comment:
+    types: [created, edited, deleted]
+  check_run:
+    types: [completed]
+permissions:
+  contents: read
+  statuses: write
+  checks: read
+  issues: read
+  pull-requests: read
+jobs:
+  resolve:
+    if: >-
+      github.event_name == 'pull_request_target' ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && github.event.comment.user.login == 'coderabbitai[bot]') ||
+      (github.event_name == 'check_run' && github.event.check_run.app.id == 347564 && github.event.check_run.name == 'CodeRabbit')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      prs: ${{ steps.prs.outputs.result }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          persist-credentials: false
+      - id: prs
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          result-encoding: string
+          script: |
+            const path = require('node:path');
+            const { resolvePulls } = require(path.join(process.env.GITHUB_WORKSPACE, '.github/scripts/review_evidence.cjs'));
+            return JSON.stringify(await resolvePulls({ github, context }));
+  review-evidence:
+    needs: resolve
+    if: needs.resolve.outputs.prs != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        pr: ${{ fromJSON(needs.resolve.outputs.prs) }}
+    concurrency:
+      group: review-evidence-${{ github.repository }}-${{ matrix.pr }}
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          persist-credentials: false
+      - name: Регрес відхилення пропущених та застарілих оглядів
+        run: node --test .github/tests/review-evidence.test.cjs
+      - name: Доказ огляду поточного head через GitHub API
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          PR_NUMBER: ${{ matrix.pr }}
+        with:
+          script: |
+            const path = require('node:path');
+            const { publishEvidence } = require(path.join(process.env.GITHUB_WORKSPACE, '.github/scripts/review_evidence.cjs'));
+            const target = { repo: context.repo, runId: context.runId,
+              payload: { issue: { number: Number(process.env.PR_NUMBER) } } };
+            await publishEvidence({ github, context: target, core });
