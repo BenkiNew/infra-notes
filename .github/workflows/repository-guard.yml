@@ -49,9 +49,9 @@ jobs:
           echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $archive" | sha256sum --check --status
           tar -xzf "$archive" -C "$RUNNER_TEMP" gitleaks
           if [[ "$BASE_SHA" =~ ^[0-9a-f]{40}$ && "$BASE_SHA" != 0000000000000000000000000000000000000000 ]]; then
-            span="--text --diff-merges=first-parent $BASE_SHA..$HEAD_SHA"
+            span="--text --diff-merges=separate $BASE_SHA..$HEAD_SHA"
           else
-            span="--text --diff-merges=first-parent $HEAD_SHA"
+            span="--text --diff-merges=separate $HEAD_SHA"
           fi
           config="$RUNNER_TEMP/guard-gitleaks.toml"
           ignore="$RUNNER_TEMP/guard-empty.gitleaksignore"

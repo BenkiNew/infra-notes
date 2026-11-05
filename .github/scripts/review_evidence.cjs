@@ -53,4 +53,18 @@ async function publishEvidence({ github, context, core }) {
   }
 }
 
-module.exports = { hasReviewEvidence, hasSuccessfulReviewCheck, publishEvidence };
+/** Resolve each real PR before selecting its serialization key, including forks. */
+async function resolvePulls({ github, context }) {
+  const direct = context.payload.pull_request?.number || context.payload.issue?.number;
+  if (Number.isInteger(direct) && direct > 0) return [direct];
+  if (context.eventName !== "check_run") throw new Error("Missing PR event");
+  const sha = context.payload.check_run.head_sha;
+  if (!/^[0-9a-f]{40}$/.test(sha)) throw new Error("Invalid check head");
+  const prs = await github.paginate(github.rest.repos.listPullRequestsAssociatedWithCommit, {
+    ...context.repo, commit_sha: sha, per_page: 100
+  });
+  return [...new Set(prs.filter(pr => pr.state === "open" && pr.head.sha === sha &&
+    Number.isInteger(pr.number) && pr.number > 0).map(pr => pr.number))];
+}
+
+module.exports = { hasReviewEvidence, hasSuccessfulReviewCheck, publishEvidence, resolvePulls };

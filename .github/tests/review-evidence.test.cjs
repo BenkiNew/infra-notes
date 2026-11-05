@@ -1,7 +1,7 @@
 "use strict";
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { hasReviewEvidence, hasSuccessfulReviewCheck, publishEvidence } = require("../scripts/review_evidence.cjs");
+const { hasReviewEvidence, hasSuccessfulReviewCheck, publishEvidence, resolvePulls } = require("../scripts/review_evidence.cjs");
 const head = "a".repeat(40);
 const proof = (user = "coderabbitai[bot]", sha = head, kind = "reviewed") => ({
   user: { login: user }, body: `<!-- final_review_risk_coverage:${JSON.stringify({ sourceCommitId: sha, coveredCommitId: sha, kind })} -->`
@@ -47,4 +47,19 @@ test("passing CodeRabbit without proof is an explicit failure", async () => {
 test("real successful review publishes exact head status", async () => {
   const h = harness([proof()], [check()]); await publishEvidence(h.args);
   assert.equal(h.statuses.at(-1).state, "success"); assert.equal(h.statuses.at(-1).sha, head);
+});
+
+test("fork check without payload PRs resolves exact real PR before locking", async () => {
+  const github = { rest: { repos: { listPullRequestsAssociatedWithCommit() {} } },
+    paginate: async () => [{ number: 12, state: "open", head: { sha: head } },
+      { number: 12, state: "open", head: { sha: head } },
+      { number: 13, state: "closed", head: { sha: head } },
+      { number: 14, state: "open", head: { sha: "b".repeat(40) } }] };
+  const context = { eventName: "check_run", repo: { owner: "synthetic", repo: "audit" },
+    payload: { check_run: { head_sha: head, pull_requests: [] } } };
+  assert.deepEqual(await resolvePulls({ github, context }), [12]);
+});
+
+test("comment and check events resolve the same per-PR lock number", async () => {
+  assert.deepEqual(await resolvePulls({ github: {}, context: { payload: { issue: { number: 12 } } } }), [12]);
 });
