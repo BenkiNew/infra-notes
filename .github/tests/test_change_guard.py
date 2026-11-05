@@ -2,6 +2,7 @@
 import importlib.util
 from pathlib import Path
 import tempfile
+import subprocess
 import unittest
 from unittest.mock import patch
 
@@ -41,3 +42,34 @@ class ChangeGuardTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 guard.main(Path.cwd(), "untrusted-ref", "a" * 40)
             call.assert_not_called()
+
+    def test_top_level_return_is_rejected(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "module.py").write_text("return 42", encoding="utf-8")
+            with self.assertRaises(SyntaxError):
+                guard.check_file(root, "module.py")
+
+    def test_repeated_yaml_keys_are_rejected(self):
+        with self.assertRaises(ValueError):
+            guard.check_yaml("with: {a: one}\nwith: {b: two}\n")
+
+    def test_yaml_tags_cannot_construct_objects(self):
+        with self.assertRaises(ValueError):
+            guard.check_yaml("!!python/object/apply:os.system ['must not execute']")
+
+    def test_type_changed_file_is_checked(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            def git(*args, data=None):
+                return subprocess.check_output(["git", "-C", str(root), *args], input=data)
+            git("init", "-q")
+            blob = git("hash-object", "-w", "--stdin", data=b"target").decode().strip()
+            git("update-index", "--add", "--cacheinfo", "120000", blob, "module.py")
+            git("-c", "user.name=Synthetic", "-c", "user.email=audit@example.invalid", "commit", "-qm", "base")
+            before = git("rev-parse", "HEAD").decode().strip()
+            (root / "module.py").write_text("return 42\n", encoding="utf-8")
+            git("add", "module.py")
+            git("-c", "user.name=Synthetic", "-c", "user.email=audit@example.invalid", "commit", "-qm", "type change")
+            after = git("rev-parse", "HEAD").decode().strip()
+            self.assertEqual(guard.main(root, before, after), 1)

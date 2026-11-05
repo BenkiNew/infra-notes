@@ -1,6 +1,7 @@
 language: uk-UA
 
 reviews:
+  fail_commit_status: true
   # Без перехресних посилань між репозиторіями (приватні PR не лінкуються на публічні й навпаки)
   related_issues: false
   related_prs: false

@@ -4,7 +4,6 @@
 за помилки Git, синтаксису чи шляху поза checkout. Не виконує код проєкту.
 Повний набір предметних тестів залишається окремим CI-компонентом.
 """
-import ast
 import json
 import os
 from pathlib import Path
@@ -30,6 +29,33 @@ def safe_path(root, name):
     return path
 
 
+def check_yaml(text):
+    """Прочитати без створення Python-об’єктів; відхилити повторені ключі."""
+    node = yaml.compose(text, Loader=yaml.SafeLoader)
+    pending = [node] if node is not None else []
+    visited = set()
+    allowed = {"map", "seq", "str", "int", "float", "bool", "null", "timestamp", "binary", "merge"}
+    while pending:
+        current = pending.pop()
+        if id(current) in visited:
+            continue
+        visited.add(id(current))
+        if current.tag.removeprefix("tag:yaml.org,2002:") not in allowed:
+            raise ValueError("Непідтримуваний тег YAML")
+        if isinstance(current, yaml.nodes.MappingNode):
+            keys = set()
+            for key, value in current.value:
+                if not isinstance(key, yaml.nodes.ScalarNode):
+                    raise ValueError("Складний ключ YAML не підтримується")
+                identity = (key.tag, key.value)
+                if identity in keys:
+                    raise ValueError("Повторений ключ YAML")
+                keys.add(identity)
+                pending.extend((key, value))
+        elif isinstance(current, yaml.nodes.SequenceNode):
+            pending.extend(current.value)
+
+
 def check_file(root, name):
     """Перевірити Python/JS/JSON і YAML конфігурації GitHub без запуску коду."""
     path = safe_path(root, name)
@@ -38,14 +64,13 @@ def check_file(root, name):
     suffix = path.suffix.lower()
     if suffix == ".py":
         with tokenize.open(path) as stream:
-            ast.parse(stream.read(), filename=name)
+            compile(stream.read(), name, "exec")
     elif suffix in {".js", ".mjs", ".cjs"}:
         subprocess.run(["node", "--check", str(path)], check=True, capture_output=True)
     elif suffix == ".json" and not name.startswith(("tests/fixtures/", "test/fixtures/")):
         json.loads(path.read_text(encoding="utf-8-sig"))
     elif suffix in {".yaml", ".yml"} and (name.startswith(".github/") or name == ".coderabbit.yaml"):
-        # BaseLoader читає лише дані; ключ YAML `on` не перетворюється на bool.
-        yaml.load(path.read_text(encoding="utf-8-sig"), Loader=yaml.BaseLoader)
+        check_yaml(path.read_text(encoding="utf-8-sig"))
 
 
 def main(root, base, head):
@@ -57,7 +82,7 @@ def main(root, base, head):
             raise ValueError("Некоректний BASE_SHA")
         span = base + "..." + head
         run_git(root, "diff", "--check", span, "--")
-        raw = run_git(root, "diff", "--name-only", "--diff-filter=ACMR", "-z", span, "--")
+        raw = run_git(root, "diff", "--name-only", "--diff-filter=ACMRT", "-z", span, "--")
     else:
         run_git(root, "show", "--format=", "--check", head, "--")
         raw = run_git(root, "ls-files", "-z", "--")

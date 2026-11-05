@@ -47,8 +47,19 @@ jobs:
           echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $archive" | sha256sum --check --status
           tar -xzf "$archive" -C "$RUNNER_TEMP" gitleaks
           if [[ "$BASE_SHA" =~ ^[0-9a-f]{40}$ && "$BASE_SHA" != 0000000000000000000000000000000000000000 ]]; then
-            span="$BASE_SHA..$HEAD_SHA"
+            span="--diff-merges=first-parent $BASE_SHA..$HEAD_SHA"
           else
-            span="-1 $HEAD_SHA"
+            span="--diff-merges=first-parent $HEAD_SHA"
           fi
-          "$RUNNER_TEMP/gitleaks" git --redact=100 --no-banner --exit-code=1 --log-opts="$span" .
+          config="$RUNNER_TEMP/guard-gitleaks.toml"
+          ignore="$RUNNER_TEMP/guard-empty.gitleaksignore"
+          curl --fail --silent --show-error --location --retry 3 \
+            https://raw.githubusercontent.com/gitleaks/gitleaks/83d9cd684c87d95d656c1458ef04895a7f1cbd8e/config/gitleaks.toml \
+            --output "$config"
+          echo "e163e53b9e7e8a8511e77271e2b323ed057759542a6d988258afe3a1fa329caf  $config" | sha256sum --check --status
+          : > "$ignore"
+          GITLEAKS_BINARY="$RUNNER_TEMP/gitleaks" GITLEAKS_CONFIG_TRUSTED="$config" \
+            GITLEAKS_IGNORE_TRUSTED="$ignore" \
+            python -m unittest discover -s .github/tests -p test_gitleaks_guard.py
+          "$RUNNER_TEMP/gitleaks" git --config="$config" --gitleaks-ignore-path="$ignore" \
+            --ignore-gitleaks-allow --redact=100 --no-banner --exit-code=1 --log-opts="$span" .
