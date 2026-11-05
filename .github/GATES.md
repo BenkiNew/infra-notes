@@ -52,3 +52,13 @@ workflow підтверджує працездатність. Лише тоді 
 (якщо завершальний крок не виконався — pending не дозволяє злиття).
 Під час приймання через Commit Status API перевіряються точний sha,
 context, state та походження, окремо від check-run базової гілки.
+
+## Доказ огляду
+
+Окремий статус `review-evidence` перевіряє через GitHub API метадані
+справжнього CodeRabbit-коментаря з coveredCommitId/sourceCommitId=head
+і kind=reviewed та успішний CodeRabbit check саме від App 347564.
+Skipped, neutral, rate-limited, чужий App або старий head не проходять.
+Workflow запускається з довіреної бази; метадані PR читаються лише як дані.
+Після реального контрольного PR цей статус також робиться required від
+GitHub Actions App 15368. Він доповнює resolved threads, а не замінює їх.

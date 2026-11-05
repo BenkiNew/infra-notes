@@ -31,6 +31,8 @@ jobs:
       - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: '24'
+      - name: Регрес доказу справжнього огляду
+        run: node --test .github/tests/review-evidence.test.cjs
       - name: Інструмент читання YAML
         run: python -I -m pip install PyYAML==6.0.3
       - name: Регрес перевірки без виконання коду проєкту

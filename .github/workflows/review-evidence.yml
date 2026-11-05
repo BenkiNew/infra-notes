@@ -1,0 +1,54 @@
+name: Доказ фактичного огляду
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review]
+  issue_comment:
+    types: [created, edited]
+  pull_request_review:
+    types: [submitted, dismissed]
+  check_run:
+    types: [completed]
+permissions:
+  contents: read
+  statuses: write
+  checks: read
+  issues: read
+  pull-requests: read
+concurrency:
+  group: review-evidence-${{ github.event.pull_request.number || github.event.issue.number || github.event.check_run.head_sha }}
+  cancel-in-progress: false
+jobs:
+  review-evidence:
+    if: >-
+      github.event_name == 'pull_request_target' ||
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && github.event.comment.user.login == 'coderabbitai[bot]') ||
+      (github.event_name == 'pull_request_review' && github.event.review.user.login == 'coderabbitai[bot]') ||
+      (github.event_name == 'check_run' && github.event.check_run.app.id == 347564 && github.event.check_run.name == 'CodeRabbit')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.event.pull_request.base.sha || github.sha }}
+          persist-credentials: false
+      - name: Регрес відхилення пропущених та застарілих оглядів
+        run: node --test .github/tests/review-evidence.test.cjs
+      - name: Доказ огляду поточного head через GitHub API
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const path = require('node:path');
+            const { publishEvidence } = require(path.join(process.env.GITHUB_WORKSPACE, '.github/scripts/review_evidence.cjs'));
+            if (context.eventName === 'check_run') {
+              const sha = context.payload.check_run.head_sha;
+              if (!/^[0-9a-f]{40}$/.test(sha)) throw new Error('Invalid check head');
+              const prs = await github.paginate(github.rest.repos.listPullRequestsAssociatedWithCommit, {
+                ...context.repo, commit_sha: sha, per_page: 100
+              });
+              for (const pr of prs.filter(pr => pr.state === 'open' && pr.head.sha === sha)) {
+                const target = { repo: context.repo, runId: context.runId, payload: { issue: { number: pr.number } } };
+                await publishEvidence({ github, context: target, core });
+              }
+            } else {
+              await publishEvidence({ github, context, core });
+            }
