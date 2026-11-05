@@ -71,3 +71,12 @@ Gitleaks використовує `--text`, тому `.gitattributes -diff` не
 Доказ огляду запускається тільки через довірені pull_request_target,
 issue_comment та check_run; подія pull_request_review не використовується,
 бо її workflow може походити з PR, навіть якщо checkout вказує base.
+
+## Узгоджене середовище
+
+Python 3.14, Node 24; checkout v7.0.1, setup-python v7.1.0,
+setup-node v7.1.0 та github-script v9.0.0 закріплені точними SHA.
+Самі JavaScript Actions використовують Node 24; setup-node задає Node
+для команд проєкту й не змінює вбудований runtime інших Actions.
+Для репозиторіїв із Ruff узгоджений інструмент — 0.17.3.
+Версії production-сервісів змінюються окремим упровадженням.
