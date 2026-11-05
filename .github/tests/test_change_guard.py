@@ -68,7 +68,7 @@ class ChangeGuardTests(unittest.TestCase):
             git("update-index", "--add", "--cacheinfo", "120000", blob, "module.py")
             git("-c", "user.name=Synthetic", "-c", "user.email=audit@example.invalid", "commit", "-qm", "base")
             before = git("rev-parse", "HEAD").decode().strip()
-            (root / "module.py").write_text("return 42\n", encoding="utf-8")
+            (root / "module.py").write_text("return 42\n", encoding="utf-8", newline="\n")
             git("add", "module.py")
             git("-c", "user.name=Synthetic", "-c", "user.email=audit@example.invalid", "commit", "-qm", "type change")
             after = git("rev-parse", "HEAD").decode().strip()
