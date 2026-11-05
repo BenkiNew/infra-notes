@@ -32,7 +32,7 @@ async function publishEvidence({ github, context, core }) {
   const head = pr.head.sha;
   if (!/^[0-9a-f]{40}$/.test(head)) throw new Error("Invalid head SHA");
   const status = async (state, description) => github.rest.repos.createCommitStatus({
-    owner, repo, sha: head, state, context: "review-evidence", description,
+    owner, repo, sha: head, state, context: "review-evidence/status", description,
     target_url: `${process.env.GITHUB_SERVER_URL}/${owner}/${repo}/actions/runs/${context.runId}`
   });
   await status("pending", "Перевіряється справжній огляд поточного head");

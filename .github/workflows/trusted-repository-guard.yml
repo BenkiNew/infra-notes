@@ -27,7 +27,7 @@ jobs:
             const sha = context.payload.pull_request.head.sha;
             if (!/^[0-9a-f]{40}$/.test(sha)) throw new Error('Invalid head SHA');
             await github.rest.repos.createCommitStatus({
-              ...context.repo, sha, state: 'pending', context: 'trusted-repository-guard',
+              ...context.repo, sha, state: 'pending', context: 'trusted-repository-guard/status',
               description: 'Довірена перевірка точного head триває',
               target_url: `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });
@@ -40,6 +40,7 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          allow-unsafe-pr-checkout: true
           path: candidate
           fetch-depth: 0
           persist-credentials: false
@@ -70,9 +71,9 @@ jobs:
           echo "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb  $archive" | sha256sum --check --status
           tar -xzf "$archive" -C "$RUNNER_TEMP" gitleaks
           if [[ "$BASE_SHA" =~ ^[0-9a-f]{40}$ && "$BASE_SHA" != 0000000000000000000000000000000000000000 ]]; then
-            span="--diff-merges=first-parent $BASE_SHA..$HEAD_SHA"
+            span="--text --diff-merges=first-parent $BASE_SHA..$HEAD_SHA"
           else
-            span="--diff-merges=first-parent $HEAD_SHA"
+            span="--text --diff-merges=first-parent $HEAD_SHA"
           fi
           config="$RUNNER_TEMP/guard-gitleaks.toml"
           ignore="$RUNNER_TEMP/guard-empty.gitleaksignore"
@@ -103,7 +104,7 @@ jobs:
             const success = process.env.GUARD_JOB_STATUS === 'success';
             await github.rest.repos.createCommitStatus({
               ...context.repo, sha, state: success ? 'success' : 'failure',
-              context: 'trusted-repository-guard',
+              context: 'trusted-repository-guard/status',
               description: success ? 'Точний head перевірено довіреним кодом' : 'Довірена перевірка не завершилася успішно',
               target_url: `${process.env.GITHUB_SERVER_URL}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`
             });

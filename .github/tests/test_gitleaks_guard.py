@@ -43,7 +43,7 @@ class GitleaksGuardTests(unittest.TestCase):
         result = subprocess.run([BINARY, "git", "--config=" + CONFIG,
             "--gitleaks-ignore-path=" + IGNORE, "--ignore-gitleaks-allow", "--redact=100",
             "--no-banner", "--report-format=json", "--report-path=" + str(report),
-            "--exit-code=1", "--log-opts=--diff-merges=first-parent " + span,
+            "--exit-code=1", "--log-opts=--text --diff-merges=first-parent " + span,
             str(root)], capture_output=True, timeout=30)
         findings = json.loads(report.read_text(encoding="utf-8")) if report.is_file() else []
         report.unlink(missing_ok=True)
@@ -93,3 +93,14 @@ class GitleaksGuardTests(unittest.TestCase):
             (root / ".gitleaksignore").mkdir()
             with self.assertRaises(IsADirectoryError if os.name != "nt" else PermissionError):
                 self.scan(root, head)
+
+    def test_binary_attribute_cannot_hide_text_secret(self):
+        """Атрибут -diff не приховує текстовий маркер від історичного скану."""
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            base = self.initialize(root)
+            (root / ".gitattributes").write_text("secret.txt -diff\n", encoding="utf-8")
+            self.commit(root)
+            (root / "secret.txt").write_text(self.fake_secret(), encoding="utf-8")
+            head = self.commit(root)
+            self.assert_secret_found(root, base + ".." + head)

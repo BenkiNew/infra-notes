@@ -43,7 +43,7 @@ compile не виконують перевірюваний код. Правил�
 
 Початковий PR перевіряється звичайним repository-guard та CodeRabbit.
 Після його злиття окремий контрольний PR зі справжнім запуском довіреного
-workflow підтверджує працездатність. Лише тоді trusted-repository-guard
+workflow підтверджує працездатність. Лише тоді trusted-repository-guard/status
 стає required зі strict=true. Сам звичайний pull_request workflow не є
 захистом від навмисного переписування перевірки автором PR.
 
@@ -55,10 +55,17 @@ context, state та походження, окремо від check-run базо
 
 ## Доказ огляду
 
-Окремий статус `review-evidence` перевіряє через GitHub API метадані
+Окремий статус `review-evidence/status` перевіряє через GitHub API метадані
 справжнього CodeRabbit-коментаря з coveredCommitId/sourceCommitId=head
 і kind=reviewed та успішний CodeRabbit check саме від App 347564.
 Skipped, neutral, rate-limited, чужий App або старий head не проходять.
 Workflow запускається з довіреної бази; метадані PR читаються лише як дані.
 Після реального контрольного PR цей статус також робиться required від
 GitHub Actions App 15368. Він доповнює resolved threads, а не замінює їх.
+
+Назви Commit Status мають суфікс `/status` і відрізняються від назв jobs.
+Gitleaks використовує `--text`, тому `.gitattributes -diff` не приховує текст.
+Для читання fork-кандидата дозволено checkout exact SHA без виконання його коду.
+Доказ огляду запускається тільки через довірені pull_request_target,
+issue_comment та check_run; подія pull_request_review не використовується,
+бо її workflow може походити з PR, навіть якщо checkout вказує base.
