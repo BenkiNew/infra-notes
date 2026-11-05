@@ -1,6 +1,7 @@
 """Синтетичні Git-історії: жодних справжніх ключів чи даних осіб."""
 import os
 import hashlib
+import json
 from pathlib import Path
 import subprocess
 import tempfile
@@ -31,11 +32,21 @@ class GitleaksGuardTests(unittest.TestCase):
         return "ghp_" + hashlib.sha256(b"synthetic audit value").hexdigest()[:36]
 
     def scan(self, root, span):
+        report = root.parent / (root.name + "-gitleaks.json")
         result = subprocess.run([BINARY, "git", "--config=" + CONFIG,
             "--gitleaks-ignore-path=" + IGNORE, "--ignore-gitleaks-allow", "--redact=100",
-            "--no-banner", "--exit-code=1", "--log-opts=--diff-merges=first-parent " + span,
+            "--no-banner", "--report-format=json", "--report-path=" + str(report),
+            "--exit-code=1", "--log-opts=--diff-merges=first-parent " + span,
             str(root)], capture_output=True, timeout=30)
-        return result.returncode
+        findings = json.loads(report.read_text(encoding="utf-8")) if report.is_file() else []
+        report.unlink(missing_ok=True)
+        return result.returncode, findings
+
+    def assert_secret_found(self, root, span):
+        code, findings = self.scan(root, span)
+        self.assertEqual(code, 1)
+        self.assertTrue(any(item.get("RuleID") == "github-pat" and item.get("File") == "secret.txt"
+                            and item.get("Commit") for item in findings), "Немає очікуваної синтетичної знахідки")
 
     def test_secret_removed_in_later_commit_is_still_detected(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -45,7 +56,7 @@ class GitleaksGuardTests(unittest.TestCase):
             self.commit(root)
             (root / "secret.txt").unlink()
             head = self.commit(root)
-            self.assertEqual(self.scan(root, head), 1)
+            self.assert_secret_found(root, head)
 
     def test_merge_secret_cannot_hide_with_pr_configuration_or_allow_comment(self):
         with tempfile.TemporaryDirectory() as folder:
@@ -61,4 +72,4 @@ class GitleaksGuardTests(unittest.TestCase):
             (root / "secret.txt").write_text(self.fake_secret() + " # gitleaks:allow", encoding="utf-8")
             (root / ".gitleaks.toml").write_text('[extend]\nuseDefault = true\n[allowlist]\nregexes = [".*"]\n', encoding="utf-8")
             head = self.commit(root)
-            self.assertEqual(self.scan(root, base + ".." + head), 1)
+            self.assert_secret_found(root, base + ".." + head)
